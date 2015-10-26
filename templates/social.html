@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+    <hr>
+    <p>
+        <table width="100%">
+            <tr>
+                <td width="100%" align="center">
+                    {% if user and not user.is_anonymous %}
+                        <a>Hello Twitter, {{ user.get_full_name|default:user.username }}!</a>
+                            <br>
+                        <a href="/logout">Logout</a>
+                    {% else %}
+                        <a href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Login with Twitter</a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="100%" align="center">
+                    {% if user and not user.is_anonymous %}
+                        <a>Hello Facebook, {{ user.get_full_name|default:user.username }}!</a>
+                            <br>
+                        <a href="/logout">Logout</a>
+                    {% else %}
+                        <a href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">Login with Facebook</a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="100%" align="center">
+                    {% if user and not user.is_anonymous %}
+                        <a>Hello Google, {{ user.get_full_name|default:user.username }}!</a>
+                            <br>
+                        <a href="/logout">Logout</a>
+                    {% else %}
+                        <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login with Google</a>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </p>
+	<hr>
+
+{% endblock %}
