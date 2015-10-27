@@ -142,12 +142,23 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+SOCIAL_AUTH_PIPELINE = (
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'social.pipeline.user.get_username',
+    'social.pipeline.social_auth.associate_by_email',  # <--- enable this one
+    'social.pipeline.user.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+)
+
+FACEBOOK_EXTENDED_PERMISSIONS     = [
+    'email',
+    'user_about_me',
+]
+
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = reverse_lazy('home')
-
-#SOCIAL_AUTH_TWITTER_KEY = 'A345R2D8gs6AsLfb5hTBQ3671'
-#SOCIAL_AUTH_TWITTER_SECRET = 'R3MLgbetV8KbXvHe61fYTedp6crZFHNjRPg0cga3HaoIv2BB3y'
-
-
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/home/'
 SOCIAL_AUTH_LOGIN_URL = '/'
-

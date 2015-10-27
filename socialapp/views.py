@@ -1,11 +1,22 @@
 
 from django.views.generic import TemplateView
 
+from django.contrib.auth.models import User
+
 from django.shortcuts import render_to_response, redirect, render
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth import logout
+
+import urllib2
+
+try:
+    import json
+except ImportError:
+    from django.utils import simplejson as json
+
+from django.http import HttpResponse
 
 ###------------------------------------------------------------
 
@@ -53,6 +64,7 @@ def auth(request, backend):
 def complete(request, backend, *args, **kwargs):
     """Authentication complete view"""
     print '--- 2 complete ---'
+
     return do_complete(request.backend, _do_login, request.user,redirect_name=REDIRECT_FIELD_NAME, *args, **kwargs)
 
 
@@ -71,6 +83,38 @@ def _do_login(backend, user, social_user):
     print '--- 1 do login ---'
     user.backend = '{0}.{1}'.format(backend.__module__,backend.__class__.__name__)
     login(backend.strategy.request, user)
+
+    username = backend.strategy.request.user.username
+
+    fbuid = social_user.uid
+
+    access_token = social_user.extra_data['access_token']
+
+    url = u'https://graph.facebook.com/{0}/' \
+          u'?fields=email,name,first_name,last_name' \
+          u'&access_token={1}'.format(
+        fbuid,
+        access_token,
+    )
+
+    print url
+
+    request = urllib2.Request(url)
+    try:
+        email = json.loads(urllib2.urlopen(request).read()).get('email')
+    except:
+        email=''
+
+
+    user = User.objects.get(username=username)
+    try:
+        if email is not None:
+            user.email=email
+    except:
+        pass
+    user.save()
+
+
     if backend.setting('SESSION_EXPIRATION', False):
         # Set session expiration date if present and enabled
         # by setting. Use last social-auth instance for current
